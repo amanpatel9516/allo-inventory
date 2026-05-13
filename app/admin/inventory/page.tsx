@@ -242,7 +242,7 @@ export default function AdminInventoryPage() {
             <CardTitle className="text-sm font-medium text-emerald-600">Total SKU Count</CardTitle>
           </CardHeader>
           <CardContent>
-             <div className="text-2xl font-bold">{[...new Set(data?.map((i: any) => i.productId))].length || 0}</div>
+             <div className="text-2xl font-bold">{data ? [...new Set(data.map((i: any) => i.productId))].length : 0}</div>
              <p className="text-xs text-slate-500 mt-1">Unique products in catalog</p>
           </CardContent>
         </Card>
