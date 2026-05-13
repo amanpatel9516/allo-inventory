@@ -1,7 +1,7 @@
 import { prisma } from './prisma';
 import { ConflictError, ExpiredError, NotFoundError } from './errors';
 import { CreateReservationInput } from './schemas';
-import { Reservation, InventoryLedger } from '@prisma/client';
+import { Reservation, InventoryLedger } from './generated/prisma';
 import { redis } from './redis';
 
 export async function createReservation({
