@@ -29,12 +29,24 @@ type Product = {
   warehouses: Warehouse[];
 };
 
-export function ProductCard({ product, mutate }: { product: Product, mutate: () => void }) {
+export function ProductCard({ 
+  product, 
+  mutate,
+  globalIsReserving,
+  setGlobalIsReserving
+}: { 
+  product: Product, 
+  mutate: () => void,
+  globalIsReserving?: boolean,
+  setGlobalIsReserving?: (val: boolean) => void
+}) {
   const [reservingId, setReservingId] = useState<string | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
   const router = useRouter();
 
   const handleReserve = async (warehouseId: string) => {
+    if (globalIsReserving) return;
+    if (setGlobalIsReserving) setGlobalIsReserving(true);
     setReservingId(warehouseId);
     setError(null);
     
@@ -63,13 +75,15 @@ export function ProductCard({ product, mutate }: { product: Product, mutate: () 
         }
         setError(data);
         mutate(); // Re-fetch to get updated stock since we hit an error (likely stock change)
+        if (setGlobalIsReserving) setGlobalIsReserving(false);
+        setReservingId(null);
       } else {
         toast.success("Item reserved! Please complete your checkout.");
         router.push(`/reservations/${data.reservation.id}`);
       }
     } catch (err) {
       setError({ error: 'INTERNAL_ERROR', message: 'Failed to communicate with server' });
-    } finally {
+      if (setGlobalIsReserving) setGlobalIsReserving(false);
       setReservingId(null);
     }
   };
@@ -140,7 +154,7 @@ export function ProductCard({ product, mutate }: { product: Product, mutate: () 
                 </div>
                 <Button 
                   onClick={() => handleReserve(w.warehouseId)}
-                  disabled={w.available === 0 || reservingId !== null}
+                  disabled={w.available === 0 || globalIsReserving || reservingId !== null}
                   variant={w.available > 0 ? "default" : "secondary"}
                   size="sm"
                   className={`relative overflow-hidden transition-all ${w.available > 0 ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg' : ''}`}

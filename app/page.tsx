@@ -3,6 +3,7 @@
 import useSWR from 'swr';
 import { ProductCard } from '@/components/ProductCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useState } from 'react';
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -17,6 +18,7 @@ export default function Home() {
   const { data: products, error, mutate, isLoading } = useSWR('/api/products', fetcher, {
     refreshInterval: 30000,
   });
+  const [globalIsReserving, setGlobalIsReserving] = useState(false);
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-12 md:py-16 lg:py-24 max-w-6xl">
@@ -62,7 +64,13 @@ export default function Home() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {products.map((product: any) => (
-            <ProductCard key={product.id} product={product} mutate={mutate} />
+            <ProductCard 
+              key={product.id} 
+              product={product} 
+              mutate={mutate} 
+              globalIsReserving={globalIsReserving}
+              setGlobalIsReserving={setGlobalIsReserving}
+            />
           ))}
         </div>
       )}
